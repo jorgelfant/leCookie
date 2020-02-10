@@ -152,6 +152,55 @@ compliquer la lecture. Lorsque vous reporterez ces modifications sur votre servl
 un bête copier-coller du code suivant ! Prenez garde à modifier correctement le code existant, et à ne pas supprimer la
 méthode doPost() de votre servlet (que j'ai ici remplacée par "...") :
 
+************************************************************************************************************************
+
+De plus amples explications :
+
+  * j'ai choisi de nommer le cookie stocké chez le client derniereConnexion ;
+
+  * j'ai mis en place une méthode nommée getCookieValue(), dédiée à la recherche d'un cookie donné dans une requête HTTP :
+
+        . à la ligne 56, elle récupère tous les cookies présents dans la requête grâce à la méthode request.getCookies(),
+          que je vous ai présentée un peu plus tôt ;
+
+        . à la ligne 57, elle vérifie si des cookies existent, c'est-à-dire si request.getCookies() n'a pas retourné null ;
+
+        . à la ligne 58, elle parcourt le tableau de cookies récupéré ;
+
+        . à la ligne 59, elle vérifie si un des éventuels cookies présents dans le tableau a le même nom que le paramètre
+          nom passé en argument, récupéré par un appel à cookie.getName() ;
+
+        . à la ligne 60, si un tel cookie est trouvé, elle retourne sa valeur via un appel à cookie.getValue().
+
+  * à la ligne 23, je teste si ma méthode getCookieValue() a retourné une valeur ou non ;
+
+  * de la ligne 24 à la ligne 43, je traite les dates grâce aux méthodes de la bibliothèque JodaTime. Je vous recommande
+    fortement d'aller vous-mêmes parcourir son guide d'utilisation ainsi que sa FAQ. C'est en anglais, mais les codes
+    d'exemples sont très explicites. Voici quelques détails en supplément des commentaires déjà présents dans le code de
+    la servlet :
+
+        . j'ai pris pour convention le format "dd/MM/yyyy HH:mm:ss", et considère donc que la date sera stockée sous
+          ce format dans le cookie derniereConnexion placé dans le navigateur du client ;
+
+        . les lignes 27 et 28 permettent de traduire la date présente au format texte dans le cookie du client en un
+          objet DateTime que nous utiliserons par la suite pour effectuer la différence avec la date courante ;
+
+        . à la ligne 30, je calcule la différence entre la date courante et la date de la dernière visite, c'est-à-dire
+          l'intervalle de temps écoulé ;
+
+        . de la ligne 32 à 40, je crée un format d'affichage de mon choix à l'aide de l'objet PeriodFormatterBuilder ;
+
+        . à la ligne 41 j'enregistre dans un String, via la méthode print(), l'intervalle mis en forme avec le format
+          que j'ai fraîchement défini ;
+
+        . enfin à la ligne 43, je transmets l'intervalle mis en forme à notre JSP, via un simple attribut de requête
+          nommé intervalleConnexions.
+
+En fin de compte, si vous mettez de côté la tambouille que nous réalisons pour manipuler nos dates et calculer
+l'intervalle entre deux connexions, vous vous rendrez compte que le traitement lié au cookie en lui-même est assez court :
+il suffit simplement de vérifier le retour de la méthode request.getCookies(), chose que nous faisons ici grâce à notre
+méthode getCookieValue().
+
 
 --%>
 

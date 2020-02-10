@@ -32,18 +32,18 @@ public class Connexion extends HttpServlet {
     //    Méthode doGet
     //******************************************************************************************************************
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        /* Tentative de récupération du cookie depuis la requête */
+        // Tentative de récupération du cookie depuis la requête
         String derniereConnexion = getCookieValue( request, COOKIE_DERNIERE_CONNEXION );
-        /* Si le cookie existe, alors calcul de la durée */
+        // Si le cookie existe, alors calcul de la durée
         if ( derniereConnexion != null ) {
-            /* Récupération de la date courante */
+            // Récupération de la date courante
             DateTime dtCourante = new DateTime();
-            /* Récupération de la date présente dans le cookie */
+            // Récupération de la date présente dans le cookie
             DateTimeFormatter formatter = DateTimeFormat.forPattern( FORMAT_DATE );
             DateTime dtDerniereConnexion = formatter.parseDateTime( derniereConnexion );
-            /* Calcul de la durée de l'intervalle */
+            // Calcul de la durée de l'intervalle
             Period periode = new Period( dtDerniereConnexion, dtCourante );
-            /* Formatage de la durée de l'intervalle */
+            // Formatage de la durée de l'intervalle
             PeriodFormatter periodFormatter = new PeriodFormatterBuilder()
                     .appendYears().appendSuffix( " an ", " ans " )
                     .appendMonths().appendSuffix( " mois " )
@@ -54,10 +54,10 @@ public class Connexion extends HttpServlet {
                     .appendSeconds().appendSuffix( " seconde", " secondes" )
                     .toFormatter();
             String intervalleConnexions = periodFormatter.print( periode );
-            /* Ajout de l'intervalle en tant qu'attribut de la requête */
+            // Ajout de l'intervalle en tant qu'attribut de la requête
             request.setAttribute( ATT_INTERVALLE_CONNEXIONS, intervalleConnexions );
         }
-        /* Affichage de la page de connexion */
+        // Affichage de la page de connexion
         this.getServletContext().getRequestDispatcher( VUE ).forward( request, response );
     }
 
@@ -76,7 +76,6 @@ public class Connexion extends HttpServlet {
 
         // Si aucune erreur de validation n'a eu lieu, alors ajout du bean Utilisateur à la session, sinon suppression
         // du bean de la session.
-
         if (form.getErreurs().isEmpty()) {
             //if (session.isNew()) {
             session.setAttribute(ATT_SESSION_USER, utilisateur);
