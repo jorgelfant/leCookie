@@ -201,6 +201,85 @@ l'intervalle entre deux connexions, vous vous rendrez compte que le traitement l
 il suffit simplement de vérifier le retour de la méthode request.getCookies(), chose que nous faisons ici grâce à notre
 méthode getCookieValue().
 
+************************************************************************************************************************
+                                          À la connexion du visiteur
+************************************************************************************************************************
+
+La seconde étape est maintenant de gérer la connexion d'un visiteur. Il va falloir :
+
+     * vérifier si la case est cochée ou non ;
+
+     * si oui, alors l'utilisateur souhaite qu'on se souvienne de lui et il nous faut :
+
+         . récupérer la date courante ;
+
+         . la convertir au format texte choisi ;
+
+         . l'enregistrer dans un cookie nommé derniereConnexion et l'envoyer au navigateur du client à travers
+           la réponse HTTP.
+
+     * si non, alors l'utilisateur ne souhaite pas qu'on se souvienne de lui et il nous faut :
+
+         . demander la suppression du cookie nommé derniereConnexion qui, éventuellement, existe déjà dans le
+           navigateur du client.
+
+************************************************************************************************************************
+
+**************************************
+Quelques explications supplémentaires :
+**************************************
+
+     * la condition du bloc if à la ligne 25 permet de déterminer si la case du formulaire, que j'ai choisi de nommer
+       memoire, est cochée ;
+
+     * les lignes 29 et 30 se basent sur la convention d'affichage choisie, à savoir "dd/MM/yyyy HH:mm:ss", pour mettre
+       en forme la date proprement, à partir de l'objet DateTime fraîchement créé ;
+
+     * j'utilise alors une méthode setCookie(), à laquelle je transmets la réponse accompagnée de trois paramètres :
+
+          . un nom et une valeur, qui sont alors utilisés pour créer un nouvel objet Cookie à la ligne 50 ;
+
+          . un entier maxAge, utilisé pour définir la durée de vie du cookie grâce à la méthode cookie.setMaxAge() ;
+
+          . cette méthode se base pour finir sur un appel à response.addCookie() dont je vous ai déjà parlé,
+            pour mettre en place une instruction Set-Cookie dans les en-têtes de la réponse HTTP.
+
+     * à la ligne 35, je demande au navigateur du client de supprimer l'éventuel cookie nommé derniereConnexion
+       qu'il aurait déjà enregistré par le passé. En effet, si l'utilisateur n'a pas coché la case du formulaire, cela
+       signifie qu'il ne souhaite pas que nous lui affichions un message, et il nous faut donc nous assurer qu'aucun
+       cookie enregistré lors d'une connexion précédente n'existe. Pour ce faire, il suffit de placer un nouveau cookie
+       derniereConnexion dans la réponse HTTP avec une durée de vie égale à zéro.
+
+Au passage, si vous vous rendez sur la documentation de la méthode setMaxAge(), vous découvrirez les trois types de
+valeurs qu'elle accepte :
+
+     * un entier positif, représentant le nombre de secondes avant expiration du cookie sauvegardé. En l'occurrence,
+       j'ai donné à notre cookie une durée de vie d'un an, soit 60 x 60 x 24 x 365 = 31 536 000 secondes ;
+
+     * un entier négatif, signifiant que le cookie ne sera stocké que de manière temporaire et sera supprimé dès que
+       le navigateur sera fermé. Si vous avez bien suivi et compris le chapitre sur les sessions, alors vous en avez
+       probablement déjà déduit que c'est de cette manière qu'est stocké le cookie JSESSIONID ;
+
+     * zéro, qui permet de supprimer simplement le cookie du navigateur.
+
+À retenir également, le seul test valable pour s'assurer qu'un champ de type <input type="checkbox"/> est coché,
+c'est de vérifier le retour de la méthode request.getParameter() : si c'est null, la case n'est pas cochée ; sinon,
+la case est cochée.
+
+************************************************************************************************************************
+                                              Reprise de la JSP
+************************************************************************************************************************
+
+Pour achever notre système, il nous reste à ajouter la case à cocher à notre formulaire, ainsi qu'un message sur notre
+page de connexion précisant depuis combien de temps l'utilisateur ne s'est pas connecté. Deux contraintes sont à
+prendre en compte :
+
+      * si l'utilisateur est déjà connecté, on ne lui affiche pas le message ;
+
+      * si l'utilisateur ne s'est jamais connecté, ou s'il n'a pas coché la case lors de sa dernière connexion,
+        on ne lui affiche pas le message.
+
+Voici le code, modifié aux lignes 14 à 16 et 29 à 30 :
 
 --%>
 
